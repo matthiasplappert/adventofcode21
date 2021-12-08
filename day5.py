@@ -40,14 +40,16 @@ for line in data:
         maxx = max(x, x_)
         miny = min(y, y_)
         maxy = max(y, y_)
-        if x < x_ and y < y_:
+        if x <= x_ and y <= y_:
             diag = diag  # noop
-        elif x < x_ and y > y_:
+        elif x <= x_ and y > y_:
             diag = diag[::-1, :]
-        elif x > x_ and y < y_:
+        elif x > x_ and y <= y_:
             diag = diag[:, ::-1]
         elif x > x_ and y > y_:
             diag = diag[::-1, ::-1]
+        else:
+            raise RuntimeError("Unexpected case")
         counts[minx:maxx + 1, miny:maxy + 1] += diag
     else:
         is_flipped = x > x_ or y > y_
