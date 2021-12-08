@@ -29,17 +29,15 @@ for line in data:
         if not consider_diagonal:
             continue
 
-        # This code is a bit ugly, but it works.
+        # This code is pretty annoying, but it creates
+        # a diagonal of appropriate size and flips / mirrors
+        # it as needed.
         xd = x_ - x
         yd = y_ - y
         assert np.abs(xd) == np.abs(yd)
         num_steps = np.abs(xd) + 1
         diag = np.zeros((num_steps, num_steps), dtype=np.int32)
         np.fill_diagonal(diag, 1)
-        minx = min(x, x_)
-        maxx = max(x, x_)
-        miny = min(y, y_)
-        maxy = max(y, y_)
         if x <= x_ and y <= y_:
             diag = diag  # noop
         elif x <= x_ and y > y_:
@@ -50,6 +48,12 @@ for line in data:
             diag = diag[::-1, ::-1]
         else:
             raise RuntimeError("Unexpected case")
+
+        # Now count all elements on the diagonal.
+        minx = min(x, x_)
+        maxx = max(x, x_)
+        miny = min(y, y_)
+        maxy = max(y, y_)
         counts[minx:maxx + 1, miny:maxy + 1] += diag
     else:
         is_flipped = x > x_ or y > y_
