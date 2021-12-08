@@ -18,19 +18,19 @@ def bin2dec(l):
 
 
 def compute_gamma(arr):
-    num_ones = np.sum(arr == 1, axis=0)
     num_zeros = np.sum(arr == 0, axis=0)
+    num_ones = np.sum(arr == 1, axis=0)
     num_ones += (num_ones == num_zeros)  # tie break towards one
-    gamma = np.argmax([num_ones, num_zeros], axis=0)
+    gamma = np.argmax([num_zeros, num_ones], axis=0)
     return gamma
 
 
 def compute_epsilon(arr):
-    num_ones = np.sum(arr == 1, axis=0)
     num_zeros = np.sum(arr == 0, axis=0)
+    num_ones = np.sum(arr == 1, axis=0)
     num_zeros -= (num_ones == num_zeros)  # tie break towards zero
-    gamma = np.argmin([num_ones, num_zeros], axis=0)
-    return gamma
+    epsilon = np.argmin([num_zeros, num_ones], axis=0)
+    return epsilon
 
 
 with open("day3.txt", "r") as f:
