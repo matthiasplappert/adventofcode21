@@ -36,6 +36,8 @@ for line in data:
     if is_diagonal:
         if not consider_diagonal:
             continue
+
+        # This code is a bit ugly, but it works.
         xd = x_ - x
         yd = y_ - y
         assert np.abs(xd) == np.abs(yd)
@@ -47,7 +49,7 @@ for line in data:
         miny = min(y, y_)
         maxy = max(y, y_)
         if x < x_ and y < y_:
-            pass
+            diag = diag  # noop
         elif x < x_ and y > y_:
             diag = diag[::-1, :]
         elif x > x_ and y < y_:
