@@ -25,9 +25,10 @@ coordinates = [
 ]
 local_minima_map = np.zeros(data.shape, dtype=bool)
 for x, y in coordinates:
-    neighbors = get_neighbors(x, y)
-    neighbors = np.array(list(filter(
-        lambda x: filter_coordinate(data.shape, x), neighbors
+    neighbors = np.array(list(
+        filter(
+            lambda x: filter_coordinate(data.shape, x),
+            get_neighbors(x, y)
     )))
     deltas = data[neighbors[:, 0], neighbors[:, 1]] - data[x, y]
     assert deltas.shape[0] == neighbors.shape[0]
