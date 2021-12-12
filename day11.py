@@ -27,7 +27,7 @@ with open("day11.txt", "r") as f:
 print(grid.shape)
 
 num_flashes_per_step = []
-first_step_synced = None
+synced_steps = []
 for step in range(1000):
     grid[:, :] += 1
     flash_mask = np.zeros(grid.shape, dtype=bool)
@@ -55,12 +55,11 @@ for step in range(1000):
         did_update = update_state()
     grid[grid > 9] = 0  # reset everybody that flashed
     num_flashes_per_step.append(np.sum(flash_mask))
-    if np.all(flash_mask) and first_step_synced is None:
-        first_step_synced = step
+    if np.all(flash_mask):
+        synced_steps.append(step)
 
 # Part 1
 print(np.sum(num_flashes_per_step[:100]))
 
 # Part 2
-assert first_step_synced is not None
-print(first_step_synced + 1)
+print(synced_steps[0] + 1)
