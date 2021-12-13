@@ -64,6 +64,7 @@ for lhs, rhs in data:
     graph[lhs].add(rhs)
     graph[rhs].add(lhs)
 assert "start" in graph
+assert "end" in graph
 
 # Part 1
 all_paths = find_path("start", graph, [])
