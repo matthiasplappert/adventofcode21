@@ -1,5 +1,4 @@
 import numpy as np
-from collections import defaultdict
 import heapq
 
 
@@ -23,12 +22,9 @@ with open("day15.txt", "r") as f:
 
 
 def dijkstra(costs, source, sink):
-    dist = defaultdict(lambda: np.inf)
-    dist[(0, 0)] = 0
-
-    # Dijkstra time.
-    q = [(0, source)]
+    dist = np.ones(costs.shape) * np.inf
     visited = set()
+    q = [(0, source)]
     while q and sink not in visited:
         d, (x, y) = heapq.heappop(q)
         if (x, y) in visited:
@@ -43,7 +39,7 @@ def dijkstra(costs, source, sink):
             d_ = costs[x_, y_] + d
             heapq.heappush(q, (d_, (x_, y_)))
 
-    return dist[sink]
+    return int(dist[sink])
 
 # Part 1
 print(dijkstra(costs, (0, 0), (costs.shape[0] - 1, costs.shape[1] - 1)))
