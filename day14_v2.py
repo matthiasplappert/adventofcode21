@@ -31,7 +31,7 @@ def simulate(template, rules, iters):
         letter_counts[x] += count
         # do not include here y since otherwise we're double-counting
         # (since y is the x of another pair)
-    sorted_counts = list(sorted(letter_counts.values(), key=lambda x: x))
+    sorted_counts = list(sorted(letter_counts.values()))
     return sorted_counts[-1] - sorted_counts[0] + 1  # +1 for final y, which doesn't have an x
 
 
