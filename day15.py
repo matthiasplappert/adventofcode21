@@ -25,23 +25,23 @@ with open("day15.txt", "r") as f:
 def dijkstra(costs, source, sink):
     dist = defaultdict(lambda: np.inf)
     dist[(0, 0)] = 0
-    prev = {}
 
     # Dijkstra time.
     q = [(0, source)]
-    visited = set([(0, 0)])
+    visited = set()
     while q and sink not in visited:
-        _, (x, y) = heapq.heappop(q)
-        neighors = list(filter(lambda n: filter_neighbor(n, costs.shape), get_neighbors(x, y)))
+        d, (x, y) = heapq.heappop(q)
+        if (x, y) in visited:
+            continue
+        dist[x, y] = d
+        visited.add((x, y))
+
+        neighors = filter(lambda n: filter_neighbor(n, costs.shape), get_neighbors(x, y))
         for (x_, y_) in neighors:
             if (x_, y_) in visited:
                 continue
-            d_ = costs[x_, y_] + dist[x, y]
-            if d_ < dist[(x_, y_)]:
-                dist[(x_, y_)] = d_
-                prev[(x_, y_)] = (x, y)
-                heapq.heappush(q, (d_, (x_, y_)))
-        visited.add((x, y))
+            d_ = costs[x_, y_] + d
+            heapq.heappush(q, (d_, (x_, y_)))
 
     return dist[sink]
 
