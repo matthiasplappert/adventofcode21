@@ -26,13 +26,17 @@ def simulate(template, rules, iters):
             new_counts[new_letter + y] += count
         counts = new_counts
 
-    letter_counts = defaultdict(int)
+    letter_counts_x = defaultdict(int)
+    letter_counts_y = defaultdict(int)
+    letters = set()
     for (x, y), count in counts.items():
-        letter_counts[x] += count
-        # do not include here y since otherwise we're double-counting
-        # (since y is the x of another pair)
-    sorted_counts = list(sorted(letter_counts.values()))
-    return sorted_counts[-1] - sorted_counts[0] + 1  # +1 for final y, which doesn't have an x
+        letter_counts_x[x] += count
+        letter_counts_y[y] += count
+        letters.add(x)
+        letters.add(y)
+    combined_counts = {k: max(letter_counts_y[k], letter_counts_x[k]) for k in letters}
+    sorted_counts = list(sorted(combined_counts.values()))
+    return sorted_counts[-1] - sorted_counts[0]
 
 
 # Part 1
