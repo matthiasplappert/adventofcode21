@@ -72,13 +72,10 @@ successful_velocities = set()
 for vel in tqdm(velocities):
     traj = Trajectory(vel)
     pos = []
-    did_hit = False
-    while traj.can_still_hit_target(target_area) and not did_hit:
+    while traj.can_still_hit_target(target_area) and not traj.is_within_target(target_area):
         traj.step()
         pos.append(traj.position)
-        if traj.is_within_target(target_area):
-            did_hit = True
-    if did_hit:
+    if traj.is_within_target(target_area):
         max_pos.append(np.max(pos, axis=0)[1])
         successful_velocities.add(vel)
 
