@@ -9,11 +9,11 @@ def parse_input(s):
     assert lhs.startswith("x=")
     assert rhs.startswith("y=")
 
-    xmin, xmax = lhs[2:].split("..")
-    ymin, ymax = rhs[2:].split("..")
-    assert int(xmin) < int(xmax)
-    assert int(ymin) < int(ymax)
-    return [[int(xmin), int(xmax)], [int(ymin), int(ymax)]]
+    xmin, xmax = [int(x) for x in lhs[2:].split("..")]
+    ymin, ymax = [int(y) for y in rhs[2:].split("..")]
+    assert xmin < xmax
+    assert ymin < ymax
+    return [[xmin, xmax], [ymin, ymax]]
 
 
 class Trajectory:
