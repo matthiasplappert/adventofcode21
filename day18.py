@@ -9,7 +9,6 @@ class Node:
 
     @property
     def depth(self):
-        # TODO: off by one?
         if self.parent is None:
             return 0
         return self.parent.depth + 1
@@ -151,6 +150,8 @@ def explode(pair: Pair):
     if right_root is not None:
         find_left_number(right_root.right).value += pair.right.value
     new_number.parent = pair.parent
+
+    assert pair.parent
     if pair.parent.left == pair:
         pair.parent.left = new_number
     elif pair.parent.right == pair:
@@ -166,6 +167,7 @@ def split(number: Number):
     new_pair = Pair(left=Number(left_value), right=Number(right_value))
     new_pair.parent = number.parent
 
+    assert number.parent
     if number.parent.left == number:
         number.parent.left = new_pair
     elif number.parent.right == number:
@@ -194,25 +196,3 @@ for idx in range(len(data) - 1):
         m2 = add(b, a).magnitude
         max_magnitude = max(max_magnitude, m1, m2)
 print(max_magnitude)
-
-
-# node = parse_line([[[[[9,8],1],2],3],4])
-# explode(node.left.left.left.left)
-# assert str(node) == "[[[[0, 9], 2], 3], 4]"
-
-# node = parse_line([7,[6,[5,[4,[3,2]]]]])
-# explode(node.right.right.right.right)
-# assert str(node) == "[7, [6, [5, [7, 0]]]]"
-
-# node = parse_line([[6,[5,[4,[3,2]]]],1])
-# explode(node.left.right.right.right)
-# assert str(node) == "[[6, [5, [7, 0]]], 3]"
-
-# node = parse_line([[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]])
-# explode(node.left.right.right.right)
-# assert str(node) == "[[3, [2, [8, 0]]], [9, [5, [4, [3, 2]]]]]", node
-
-# a = [[[[4,3],4],4],[7,[[8,4],9]]]
-# b = [1,1]
-# node = add(parse_line(a), parse_line(b))
-# assert str(node) == "[[[[0, 7], 4], [[7, 8], [6, 0]]], [8, 1]]", node
