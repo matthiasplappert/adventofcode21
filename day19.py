@@ -105,7 +105,10 @@ for direction in directions:
     rotations += (direction @ permutations).tolist()
 rotations = np.array(rotations)
 
-# Find all transformations between overlapping points.
+# Find all transformations between overlapping points. We will
+# use those (forward and inverse) to then find a path from (0, scanner_idx).
+# Once we have a path, we can concatenate all transformations to translate
+# points into the same coordinate system.
 transformations = {}
 for idx1 in tqdm(range(len(scanners) - 1)):
     for idx2 in range(idx1 + 1, len(scanners)):
