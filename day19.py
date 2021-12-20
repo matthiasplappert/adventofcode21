@@ -109,25 +109,25 @@ def dijkstra(vertices: List[Tuple[int, int]], source: int) -> Dict[int, List[Tup
 
 def find_transformation(points1, points2, rotations) -> Optional[Transformation]:
     for rotation in rotations:
-        # Rotate points2 into a different coordinate system.
+        # Rotate points2 into a different coordinate system, which is the candidate
+        # rotation.
         points2_ = points2 @ rotation
 
         # Now check how far away each point in the translated points2_ is
-        # from all other points in points1.
-        delta_counts = defaultdict(int)
+        # from all other points in points1. If there are >=12 points with
+        # the same offset, this is the missing translation.
+        offset_counts = defaultdict(int)
         for point2_ in points2_:
-            deltas = points1 - point2_[None, :]
-            for delta in deltas:
-                if np.max(np.abs(delta)) > 2 * MAX_UNITS:
+            offsets = points1 - point2_[None, :]
+            for offset in offsets:
+                if np.max(np.abs(offset)) > 2 * MAX_UNITS:
                     # Too far away; both scanners could not have measured this point
                     # since their measurment regions don't overlap.
                     continue
-                delta_counts[tuple(delta)] += 1
+                offset_counts[tuple(offset)] += 1
+                if offset_counts[tuple(offset)] >= 12:
+                    return Transformation(rotation, offset)
 
-        for delta, count in delta_counts.items():
-            if count < 12:
-                continue
-            return Transformation(rotation, delta)
     return None
 
 
