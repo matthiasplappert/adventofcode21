@@ -143,7 +143,9 @@ with open("day19.txt", "r") as f:
     all_points = list(map(parse_block, f.read().split("\n\n")))
 num_scanners = len(all_points)
 
-# TODO: the exercise says there are 24 rotations but this generates 48.
+# TODO: the exercise says there are 24 rotations but this generates 48 (it was unclear
+# to me if coordinate systems can mirror, so I included those). This part was stated in
+# a very confusing way in the task description.
 directions = [np.diag((x, y, z)) for x in [-1, 1] for y in [-1, 1] for z in [-1, 1]]
 permutations = get_permutations()
 rotations = []
