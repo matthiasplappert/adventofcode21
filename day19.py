@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, List
 import numpy as np
 from tqdm import tqdm
 from collections import defaultdict
@@ -74,14 +74,12 @@ def parse_block(block: str):
     return np.array([[int(x) for x in l.strip().split(",")] for l in block.splitlines()[1:]])
 
 
-def dijkstra(vertices, source, sink):
-    if source == sink:
-        return [(source, sink)]
-
+def dijkstra(vertices: List[Tuple[int, int]], source: int) -> Dict[int, List[Tuple[int, int]]]:
+    nodes = set(x for x, _ in vertices) | set(y for _, y in vertices)
     visited = set()
     q = [(0, source)]
     prev = {}
-    while q and sink not in visited:
+    while q:
         d, v = heapq.heappop(q)
         if v in visited:
             continue
@@ -96,11 +94,17 @@ def dijkstra(vertices, source, sink):
             prev[y_] = x_
             heapq.heappush(q, (d_, y_))
 
-    path = [sink]
-    while path[-1] != source:
-        path.append(prev[path[-1]])
-    path.reverse()
-    return list(zip(path[:-1], path[1:]))
+    paths = {}
+    for node in nodes:
+        if node == source:
+            path = [0, 0]
+        else:
+            path = [node]
+            while path[-1] != source:
+                path.append(prev[path[-1]])
+            path.reverse()
+        paths[node] = list(zip(path[:-1], path[1:]))
+    return paths
 
 
 def find_transformation(points1, points2, rotations) -> Optional[Transformation]:
@@ -170,13 +174,14 @@ for idx1 in tqdm(range(num_scanners - 1)):
         assert get_num_matches(transformations[(idx2, idx1)](points2), points1) >= 12
         assert get_num_matches(transformations[(idx1, idx2)](points1), points2) >= 12
 
-# Find path between scanner 0 to all other scanners.
+# Find path between scanner 0 to all other scanners. We use this to construct a transformation
+# chain that allows us to move from the coordinate of scanner_idx to the coordinate of scanner 0.
+# (i.e. it applies it in reverse from scanner_idx -> 0).
 transformation_chains = {}
+paths = dijkstra(list(transformations.keys()), 0)
 for scanner_idx in range(num_scanners):
-    # TODO: could find all paths from the source to any node in one go.
-    path = dijkstra(transformations.keys(), 0, scanner_idx)
     chain = []
-    for (idx1, idx2) in reversed(path):
+    for (idx1, idx2) in reversed(paths[scanner_idx]):
          chain.append(transformations[idx2, idx1])
     transformation_chains[scanner_idx] = chain
 
