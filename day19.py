@@ -22,7 +22,7 @@ class Transformation:
         return (x @ self.rotation) + self.translation
 
     def inverse(self):
-        # R^-1 = R^T for transformations. For the inverse, the affine part needs to be rotated as well.
+        # R^-1 = R^T for rotations. For the inverse, the affine part needs to be rotated as well.
         return Transformation(self.rotation.T, -self.rotation @ self.translation)
 
 
@@ -169,6 +169,9 @@ for idx1 in tqdm(range(num_scanners - 1)):
         transformation = find_transformation(points1, points2, rotations)
         if transformation is None:
             continue
+        # We keep botht the forward and inverse rotation because we need to find
+        # a path from (0, scanner_idx) for scanner_idx in range(num_scanners). Some
+        # of them will only be reachable via the inverse transformation.
         transformations[(idx2, idx1)] = transformation
         transformations[(idx1, idx2)] = transformation.inverse()
 
