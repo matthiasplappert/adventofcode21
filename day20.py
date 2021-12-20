@@ -70,7 +70,7 @@ infinity_region = convert_char_to_int(".")
 curr_grid = grid
 curr_infinity_region = infinity_region
 for _ in tqdm(range(2)):
-    curr_grid = np.pad(curr_grid, 2, mode="constant", constant_values=curr_infinity_region)
+    curr_grid = np.pad(curr_grid, 1, mode="constant", constant_values=curr_infinity_region)
     curr_grid, curr_infinity_region = apply_rules(curr_grid, rules, curr_infinity_region)
 print(np.sum(curr_grid))
 
