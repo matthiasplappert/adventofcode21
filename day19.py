@@ -1,9 +1,12 @@
-from typing import Dict, Optional, Tuple, List
-import numpy as np
-from tqdm import tqdm
 from collections import defaultdict
 from dataclasses import dataclass
 import heapq
+import itertools
+from typing import Dict, Optional, Tuple, List
+
+import numpy as np
+from scipy.spatial.transform import Rotation as R
+from tqdm import tqdm
 
 
 MAX_UNITS = 1000
@@ -18,58 +21,22 @@ class Transformation:
         self.rotation = np.array(rotation)
         self.translation = np.array(translation)
 
-    def __call__(self, x):
-        return (x @ self.rotation) + self.translation
+    def __call__(self, points: np.ndarray) -> np.ndarray:
+        return (points @ self.rotation) + self.translation
 
     def inverse(self):
         # R^-1 = R^T for rotations. For the inverse, the affine part needs to be rotated as well.
         return Transformation(self.rotation.T, -self.rotation @ self.translation)
 
 
-def apply_transformation_chain(chain, x):
+def apply_transformation_chain(chain: List[Transformation], points: np.ndarray) -> np.ndarray:
+    assert points.shape[-1] == 3
     for transformation in chain:
-        x = transformation(x)
-    return x
+        points = transformation(points)
+    return points
 
 
-def get_permutations():
-    return np.array([
-        [
-            [1, 0, 0],
-            [0, 1, 0],
-            [0, 0, 1],
-        ],
-        [
-            [0, 1, 0],
-            [0, 0, 1],
-            [1, 0, 0],
-        ],
-
-        [
-            [0, 0, 1],
-            [1, 0, 0],
-            [0, 1, 0],
-        ],
-
-        [
-            [0, 0, 1],
-            [0, 1, 0],
-            [1, 0, 0],
-        ],
-        [
-            [1, 0, 0],
-            [0, 0, 1],
-            [0, 1, 0],
-        ],
-        [
-            [0, 1, 0],
-            [1, 0, 0],
-            [0, 0, 1],
-        ],
-    ])
-
-
-def parse_block(block: str):
+def parse_block(block: str) -> np.ndarray:
     assert block.startswith("--- scanner")
     return np.array([[int(x) for x in l.strip().split(",")] for l in block.splitlines()[1:]])
 
@@ -131,7 +98,7 @@ def find_transformation(points1, points2, rotations) -> Optional[Transformation]
     return None
 
 
-def get_num_matches(points, ref_points):
+def get_num_matches(points: np.ndarray, ref_points: np.ndarray) -> int:
     num_matches = 0
     for point in points:
         num_matches += np.sum(np.all(point[None, :] == ref_points, axis=1))
@@ -143,15 +110,17 @@ with open("day19.txt", "r") as f:
     all_points = list(map(parse_block, f.read().split("\n\n")))
 num_scanners = len(all_points)
 
-# TODO: the exercise says there are 24 rotations but this generates 48 (it was unclear
-# to me if coordinate systems can mirror, so I included those). This part was stated in
-# a very confusing way in the task description.
-directions = [np.diag((x, y, z)) for x in [-1, 1] for y in [-1, 1] for z in [-1, 1]]
-permutations = get_permutations()
+# Create all rotations.
+eye = np.eye(3, dtype=int)
 rotations = []
-for direction in directions:
-    rotations += (direction @ permutations).tolist()
-rotations = np.array(rotations)
+for radians in itertools.product(*[[0, np.pi / 2, np.pi, -np.pi / 2]] * 3):
+    out = eye
+    for axis, radian in zip("xyz", radians):
+        r = R.from_euler(axis, radian)
+        out = (out @ r.as_matrix()).astype(int)
+    out = out.tolist()
+    if out not in rotations:
+        rotations.append(out)
 
 # Find all transformations between overlapping points. We will
 # use those (forward and inverse) to then find a path from (0, scanner_idx).
