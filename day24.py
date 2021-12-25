@@ -3,11 +3,15 @@ from tqdm import tqdm
 from copy import copy
 from functools import lru_cache
 import time
+import numpy as np
+
+
+INT = np.int32
 
 
 @lru_cache
-def cached_to_int(s: str) -> int:
-    return int(s)
+def cached_to_int(s: str) -> INT:
+    return INT(s)
 
 
 def load_or_literal(state, b):
@@ -44,7 +48,7 @@ def mod(state, a, b):
 
 def eql(state, a, b):
     registers, _ = state
-    registers[a] = int(registers[a] == load_or_literal(state, b))
+    registers[a] = INT(registers[a] == load_or_literal(state, b))
 
 
 OPS = {
@@ -83,7 +87,7 @@ with open("day24.txt", "r") as f:
 
 # This implementation does not use classes since the overhead of creating
 # them when branching is too large.
-alus = [({"x": 0, "y": 0, "z": 0, "w": 0}, [])]
+alus = [({"x": INT(0), "y": INT(0), "z": INT(0), "w": INT(0)}, [])]
 for idx, instruction in enumerate(instructions):
     print(idx)
 
@@ -95,6 +99,7 @@ for idx, instruction in enumerate(instructions):
         start_time = time.time()
         for registers, inputs in alus:
             for possible_input in range(1, 10):
+                possible_input = INT(possible_input)
                 new_alu = (copy(registers), inputs + [possible_input])
                 new_alus.append(new_alu)
         alus = new_alus
